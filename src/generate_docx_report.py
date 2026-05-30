@@ -17,8 +17,10 @@ class ReportGenerator:
     """DOCX 보고서 생성 클래스"""
     
     def __init__(self, output_dir: str = "../report"):
-        self.output_dir = output_dir
-        os.makedirs(output_dir, exist_ok=True)
+        script_dir = Path(__file__).resolve().parent
+        output_path = Path(output_dir)
+        self.output_dir = output_path if output_path.is_absolute() else (script_dir / output_path).resolve()
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         self.doc = Document()
         self.setup_document_style()
     
@@ -128,14 +130,15 @@ class ReportGenerator:
                     # 헤더 배경색
                     shading_elm = OxmlElement('w:shd')
                     shading_elm.set(qn('w:fill'), '4F81BD')
-                    cell._element.get_or_add_pPr().append(shading_elm)
+                    cell._element.get_or_add_tcPr().append(shading_elm)
     
     def add_image(self, image_path: str, width: float = 6.0) -> None:
         """이미지 추가"""
-        if os.path.exists(image_path):
+        image_path_str = str(image_path)
+        if os.path.exists(image_path_str):
             para = self.doc.add_paragraph()
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            para.add_run().add_picture(image_path, width=Inches(width))
+            para.add_run().add_picture(image_path_str, width=Inches(width))
             para.paragraph_format.space_before = Pt(6)
             para.paragraph_format.space_after = Pt(6)
     
@@ -174,6 +177,9 @@ class ReportGenerator:
 
 def load_experimental_results(results_dir: str = "../results") -> dict:
     """실험 결과 로드"""
+    script_dir = Path(__file__).resolve().parent
+    results_path = Path(results_dir)
+    final_results_dir = results_path if results_path.is_absolute() else (script_dir / results_path).resolve()
     results = {
         'bf_results': None,
         'cms_results': None,
@@ -181,9 +187,9 @@ def load_experimental_results(results_dir: str = "../results") -> dict:
     }
     
     # 결과 파일 로드
-    bf_path = os.path.join(results_dir, "bloom_filter_results.json")
-    cms_path = os.path.join(results_dir, "count_min_sketch_results.json")
-    summary_path = os.path.join(results_dir, "summary_report.json")
+    bf_path = final_results_dir / "bloom_filter_results.json"
+    cms_path = final_results_dir / "count_min_sketch_results.json"
+    summary_path = final_results_dir / "summary_report.json"
     
     try:
         if os.path.exists(bf_path):
@@ -609,8 +615,11 @@ def generate_report_with_results(results_dir: str = "../results",
     gen.add_page_break()
     
     # 결과 시각화
-    charts_dir = os.path.join(results_dir, "charts")
-    if os.path.exists(charts_dir):
+    script_dir = Path(__file__).resolve().parent
+    results_path = Path(results_dir)
+    final_results_dir = results_path if results_path.is_absolute() else (script_dir / results_path).resolve()
+    charts_dir = final_results_dir / "charts"
+    if charts_dir.exists():
         gen.add_heading("실험 결과 시각화", level=1)
         
         # 차트 추가
@@ -621,8 +630,8 @@ def generate_report_with_results(results_dir: str = "../results",
         ]
         
         for chart_file, description in chart_files:
-            chart_path = os.path.join(charts_dir, chart_file)
-            if os.path.exists(chart_path):
+            chart_path = charts_dir / chart_file
+            if chart_path.exists():
                 gen.add_heading(description, level=2)
                 gen.add_image(chart_path)
     

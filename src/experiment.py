@@ -7,6 +7,7 @@ import sys
 import os
 import csv
 import json
+from pathlib import Path
 from typing import Dict, List, Tuple
 import tracemalloc
 
@@ -19,9 +20,11 @@ class StreamingAlgorithmExperiment:
     """스트리밍 알고리즘 실험 클래스"""
     
     def __init__(self, data_path: str, output_dir: str = "../results"):
+        script_dir = Path(__file__).resolve().parent
+        output_path = Path(output_dir)
+        self.output_dir = output_path if output_path.is_absolute() else (script_dir / output_path).resolve()
         self.data_path = data_path
-        self.output_dir = output_dir
-        os.makedirs(output_dir, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # Ground Truth 계산
         print("[INFO] Ground Truth 계산 중...")
@@ -202,10 +205,9 @@ class StreamingAlgorithmExperiment:
     
     def save_results(self, results: List[Dict], filename: str) -> None:
         """결과를 CSV 파일로 저장"""
-        output_path = os.path.join(self.output_dir, filename)
-        
         if not results:
             return
+        output_path = self.output_dir / filename
         
         with open(output_path, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=results[0].keys())
@@ -216,7 +218,7 @@ class StreamingAlgorithmExperiment:
     
     def save_json_results(self, results: List[Dict], filename: str) -> None:
         """결과를 JSON 파일로 저장"""
-        output_path = os.path.join(self.output_dir, filename)
+        output_path = self.output_dir / filename
         
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2, ensure_ascii=False)

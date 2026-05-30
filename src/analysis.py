@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 import os
+from pathlib import Path
 from typing import Dict, List
 import numpy as np
 
@@ -14,7 +15,9 @@ class ResultAnalyzer:
     """실험 결과 분석 클래스"""
     
     def __init__(self, results_dir: str = "../results"):
-        self.results_dir = results_dir
+        script_dir = Path(__file__).resolve().parent
+        results_path = Path(results_dir)
+        self.results_dir = results_path if results_path.is_absolute() else (script_dir / results_path).resolve()
         self.bf_results = None
         self.cms_results = None
         
@@ -70,8 +73,10 @@ class ResultAnalyzer:
         axes[1].legend()
         axes[1].grid(True)
         
+        charts_dir = self.results_dir / 'charts'
+        charts_dir.mkdir(parents=True, exist_ok=True)
         plt.tight_layout()
-        plt.savefig(os.path.join(self.results_dir, 'charts', '01_bloom_filter_analysis.png'), dpi=150, bbox_inches='tight')
+        plt.savefig(charts_dir / '01_bloom_filter_analysis.png', dpi=150, bbox_inches='tight')
         print("[INFO] 저장됨: 01_bloom_filter_analysis.png")
         plt.close()
     
@@ -109,8 +114,10 @@ class ResultAnalyzer:
         axes[1].legend()
         axes[1].grid(True)
         
+        charts_dir = self.results_dir / 'charts'
+        charts_dir.mkdir(parents=True, exist_ok=True)
         plt.tight_layout()
-        plt.savefig(os.path.join(self.results_dir, 'charts', '02_count_min_sketch_analysis.png'), dpi=150, bbox_inches='tight')
+        plt.savefig(charts_dir / '02_count_min_sketch_analysis.png', dpi=150, bbox_inches='tight')
         print("[INFO] 저장됨: 02_count_min_sketch_analysis.png")
         plt.close()
     
@@ -175,8 +182,10 @@ class ResultAnalyzer:
         ax2.text(0, bf_fpr, f'{bf_fpr:.6f}', ha='center', va='bottom', color='#1f77b4')
         ax2_twin.text(0.5, cms_error, f'{cms_error:.6f}', ha='center', va='bottom', color='#ff7f0e')
         
+        charts_dir = self.results_dir / 'charts'
+        charts_dir.mkdir(parents=True, exist_ok=True)
         plt.tight_layout()
-        plt.savefig(os.path.join(self.results_dir, 'charts', '03_algorithm_comparison.png'), dpi=150, bbox_inches='tight')
+        plt.savefig(charts_dir / '03_algorithm_comparison.png', dpi=150, bbox_inches='tight')
         print("[INFO] 저장됨: 03_algorithm_comparison.png")
         plt.close()
     

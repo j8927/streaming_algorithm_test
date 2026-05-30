@@ -1,0 +1,22 @@
+{
+  "bloom_filter": {
+    "best_config": {
+      "size": 100000,
+      "hash_count": 7
+    },
+    "memory_mb": 0.35060787200927734,
+    "processing_time_sec": 33.19054675102234,
+    "throughput_records_per_sec": 16327.209191975968,
+    "false_positive_rate": 0.0
+  },
+  "count_min_sketch": {
+    "best_config": {
+      "width": 500,
+      "depth": 3
+    },
+    "memory_mb": 0.0888357162475586,
+    "processing_time_sec": 18.38775658607483,
+    "throughput_records_per_sec": 29471.186300692676,
+    "avg_relative_error": 66.0205862898678
+  }
+}
